@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<script src="ejs.js"></script>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <title>PDF Viewer</title>
+    <link href='https://fonts.googleapis.com/css?family=Merienda' rel='stylesheet'>
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<center>
+<h2>PDF Online</h2>
+<br />
+
+<% data.forEach((item) => { %>
+    <a href=<%= item.url %>>
+        <%= item.name %>
+    </a>
+        (<%= item.viewers %>)
+    <br />
+<% }) %>
+
+</center>
