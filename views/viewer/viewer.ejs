@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <title>PDF Viewer</title>
+    <link href='https://fonts.googleapis.com/css?family=Merienda' rel='stylesheet'>
+    <link rel="stylesheet" href="viewer.css">
+</head>
+
+<body>
+    <div class="container">
+        <div id="controller">
+            <button class="btn" id="prev">Previous</button>
+            <button class="btn" id="next">Next</button>
+            &nbsp; &nbsp;
+            <span id="page">Page:
+                <span id="page_num"></span> /
+                <span id="page_count"></span>
+            </span>
+            &nbsp; &nbsp;
+            <button class="btn" id="minus">-</button>
+            <button class="btn" id="plus">+</button>
+        </div>
+        
+        <div id='loadingbar'>
+            <div id='loaded'>
+                
+            </div>
+        </div>
+        <div id="scroll" style="position: relative;">
+            <!--        <canvas id="the-canvas"></canvas> -->
+            <canvas id="cursor" style="z-index: 1;"></canvas>
+            <canvas id="the-canvas" style="z-index: 0;"></canvas>
+        </div>
+    </div>
+    </div>
+    
+    <script src="//mozilla.github.io/pdf.js/build/pdf.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+
+    <script type="text/javascript">
+        var data= "<%= data %>";
+    </script>
+
+    <script src="view.js"></script>
+</body>
+
+</html>

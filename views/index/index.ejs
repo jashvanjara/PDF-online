@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<script src="ejs.js"></script>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <title>PDF Viewer</title>
+    <link href='https://fonts.googleapis.com/css?family=Merienda' rel='stylesheet'>
+    <link rel="stylesheet" href="index/index.css">
+</head>
+
+<body>
+    <h2>PDF Online</h2>
+
+    <br />
+    <% Object.keys(publicStreamList).forEach(function(key) { %>
+        <a href=<%= publicStreamList[key].id %>>
+            <%= publicStreamList[key].name %>
+        </a> - <%= publicStreamList[key].viewerCount %> viewers   
+            (Progress: <%= publicStreamList[key].currentPage %>/<%= publicStreamList[key].pageLimit %>)
+        <br />
+    <% }) %>
+
+    <% if(numberOfStreams == 0){ %>
+        <p>There are no streams currently running</p>
+    <% } %>
+
+    <br />
+    <br />
+
+    <p>Tutors: <a href="new">Click here to create a new stream</a></p>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+    <script src="index/index.js"></script>
+</body>
