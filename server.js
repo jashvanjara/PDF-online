@@ -164,7 +164,10 @@ app.get('/', function (req, res) {
     res.render('index/index', {publicStreamList: publicStreamList, numberOfStreams: numberOfStreams})
 });
 
-// Start Website
+/// ---------------- Start Website ----------------
+// Glitch
+app.listen(8080);
+// Self Host
 http.listen(25565, function () {
     console.log('listening on *:25565');
     // Debug:
