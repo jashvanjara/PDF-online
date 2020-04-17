@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<script src="ejs.js"></script>
+
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=windows-1252">
+    <title>PDF Viewer</title>
+    <link href='https://fonts.googleapis.com/css?family=Merienda' rel='stylesheet'>
+    <link rel="stylesheet" href="index/index.css">
+</head>
+
+<body>
+    <h2>Create Stream</h2>
+
+    <br />
+    <form>
+        <label for="steramName">Stream name:</label><br>
+        <input type="text" id="steramName" name="steramName"><br>
+        <label for="tutorName">Tutor name:</label><br>
+        <input type="text" id="tutorName" name="tutorName">
+
+        <br>
+        <br>
+
+        <label for="file">Choose a file:</label>
+        <select id="file">
+        <% currentFiles.forEach(function(file) { %>
+            <option value=<%= file.name %>> <%= file.url %> </option>
+        <% }); %>
+        </select>
+      </form>
+
+    <br />
+    
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="../socket.io/socket.io.js"></script>
+    <script src="index/index.js"></script>
+</body>

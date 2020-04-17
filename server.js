@@ -48,13 +48,7 @@ function ConvertFile(currentFile, newFile) {
 }
 
 // Reading files
-var ReadFiles = function(err, files) {
-    // Check for folder
-    if (err) {
-        console.error("Could not list the directory.", err);
-        process.exit(1);
-    }
-
+function ReadFiles(files) {
     // Delete files older then a week:
     var result = findRemoveSync(path, {age: {seconds: 60*60*24*14}, extensions: ".pdf"});
     console.log("Deleted old files:");
@@ -90,16 +84,14 @@ var ReadFiles = function(err, files) {
 
     // Log files available
     console.log(currentFiles);
-
-    // Update New Page data
-    app.get('/new', function (req, res) {
-        res.render('new', {data: currentFiles})
-    });
+    return currentFiles;
 };
 
-// Load file directory using ReadFiles function
-fs.readdir(path, ReadFiles)
-
+// Update New Page data
+app.get('/new', function (req, res) {
+    // Load file directory using ReadFiles function
+    res.render('new/new', {currentFiles:  ReadFiles(fs.readdirSync(path))});
+});
 
 /// ---------------- Streams ----------------
 // Variables
