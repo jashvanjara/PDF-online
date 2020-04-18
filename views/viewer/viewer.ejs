@@ -9,6 +9,10 @@
 </head>
 
 <body>
+    "<%= type %>"
+    "<%= file %>"
+    "<%= streamDetails %>"
+    <!-- 
     <div class="container">
         <div id="controller">
             <button class="btn" id="prev">Previous</button>
@@ -29,7 +33,7 @@
             </div>
         </div>
         <div id="scroll" style="position: relative;">
-            <!--        <canvas id="the-canvas"></canvas> -->
+            <!--        <canvas id="the-canvas"></canvas> - ->
             <canvas id="cursor" style="z-index: 1;"></canvas>
             <canvas id="the-canvas" style="z-index: 0;"></canvas>
         </div>
@@ -41,10 +45,10 @@
     <script src="../socket.io/socket.io.js"></script>
 
     <script type="text/javascript">
-        var data= "<%= data %>";
+        var streamDetails= "<%= streamDetails %>";
     </script>
-
-    <script src="view.js"></script>
+    -->
+    <script src="viewer.js"></script>
 </body>
 
 </html>

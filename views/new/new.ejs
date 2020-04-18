@@ -12,9 +12,9 @@
     <h2>Create Stream</h2>
 
     <br />
-    <form>
-        <label for="steramName">Stream name:</label><br>
-        <input type="text" id="steramName" name="steramName"><br>
+    <form method="post" action="/new">
+        <label for="streamName">Stream name:</label><br>
+        <input type="text" id="streamName" name="streamName"><br>
         <label for="tutorName">Tutor name:</label><br>
         <input type="text" id="tutorName" name="tutorName">
 
@@ -22,11 +22,16 @@
         <br>
 
         <label for="file">Choose a file:</label>
-        <select id="file">
+        <select id="file" name="file">
         <% currentFiles.forEach(function(file) { %>
             <option value=<%= file.name %>> <%= file.url %> </option>
         <% }); %>
         </select>
+
+        <br>
+        <br>
+
+        <button class='btn' type="submit">Create Stream</button>
       </form>
 
     <br />

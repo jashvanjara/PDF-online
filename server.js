@@ -2,8 +2,11 @@
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
+const bodyParser = require('body-parser');
 var io = require('socket.io')(http);
 var fs = require('fs');
+var serveIndex = require('serve-index');
+const getPageCount = require('docx-pdf-pagecount');
 var uniqid = require('uniqid');
 var findRemoveSync = require('find-remove');
 var CloudmersiveConvertApiClient = require('cloudmersive-convert-api-client');
@@ -16,6 +19,10 @@ path = './public/files/';
 // Express:
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/views'));
+app.use(bodyParser.urlencoded({extended: true}));
+app.use('/files', 
+express.static(__dirname + '/public/files'), 
+serveIndex(__dirname + '/public/files'));
 
 // PPT to PDF Client
 var defaultClient = CloudmersiveConvertApiClient.ApiClient.instance;
@@ -93,24 +100,45 @@ app.get('/new', function (req, res) {
     res.render('new/new', {currentFiles:  ReadFiles(fs.readdirSync(path))});
 });
 
+// Create new Stream
+app.post('/new', function(req, res){
+    console.log(req.body);
+    getPageCount(path + req.body.file).then(pages => {
+        console.log(pages);
+        newID = newStream(req.body.streamName, req.body.tutorName, req.body.file, pages);
+        res.redirect('/' + newID.streamID + '/' + newID.admimID);
+    })
+});
+
 /// ---------------- Streams ----------------
 // Variables
 streams = {};
 publicStreamList= {}
 numberOfStreams = 0;
 // Function
-function newStream(name, pageCount) {
+function newStream(name, tutor, file, pageCount) {
     // Create ID for URL
     id = uniqid();
+    admin = uniqid();
     numberOfStreams += 1;
 
     // List of streams
-    streams[id] = {id: id, name: name, viewerCount: 0,
-        currentPage: 1, pageLimit: pageCount, admin: uniqid()};
+    streams[id] = {id: id, name: name, tutor: tutor, viewerCount: 0,
+        currentPage: 1, pageLimit: pageCount, file: file, admin: admin};
 
 
-    publicStreamList[id] = {id: id, name: name, viewerCount: 0,
+    publicStreamList[id] = {id: id, name: name, tutor: tutor, viewerCount: 0,
         currentPage: 1, pageLimit: pageCount}
+
+    app.get('/' + id, function(req, res){
+        res.render('viewer/viewer', {type: user, file: file, streamDetails: streams[id]})
+    })
+
+    app.get('/' + id + '/' + admin, function(req, res){
+        res.render('viewer/viewer', {type: admin, file: file, streamDetails: streams[id]})
+    })
+    
+    return {streamID: id, admimID: admin};
 }
 
 function updateStreamName(id, name){
