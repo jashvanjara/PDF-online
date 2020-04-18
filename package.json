@@ -8,6 +8,7 @@
     "cloudmersive-convert-api-client": "^2.4.3",
     "docx-pdf-pagecount": "0.0.3",
     "ejs": "^3.0.2",
+    "express-fileupload": "^1.1.7-alpha.3",
     "express.js": "^1.0.0",
     "find-remove": "^2.0.1",
     "fs": "^0.0.1-security",

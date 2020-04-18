@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 var io = require('socket.io')(http);
 var fs = require('fs');
 var serveIndex = require('serve-index');
+const fileUpload = require('express-fileupload');
 const getPageCount = require('docx-pdf-pagecount');
 var uniqid = require('uniqid');
 var findRemoveSync = require('find-remove');
@@ -20,6 +21,7 @@ path = './public/files/';
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/views'));
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(fileUpload());
 app.use('/files', 
 express.static(__dirname + '/public/files'), 
 serveIndex(__dirname + '/public/files'));
@@ -50,64 +52,116 @@ function ConvertFile(currentFile, newFile) {
                     console.error(err)
                 }
             }); 
+            callback();
         }
     });
 }
 
 // Reading files
-function ReadFiles(files) {
-    // Delete files older then a week:
-    var result = findRemoveSync(path, {age: {seconds: 60*60*24*14}, extensions: ".pdf"});
-    console.log("Deleted old files:");
-    console.log(result);
+function ReadFiles(callback) {
+    fs.readdir(path, function(err, files)
+    {
+        // Delete files older then a week:
+        var result = findRemoveSync(path, {age: {seconds: 60*60*24*14}, extensions: ".pdf"});
+        console.log("Deleted old files:");
+        console.log(result);
 
-    // Parse all files
-    currentFiles = []
-    files.forEach(function(file, index){
+        // Parse all files
+        currentFiles = []
+        files.forEach(function(file, index){
 
-        var result = findRemoveSync('/tmp', {age: {seconds: 3600}, extensions: '.jpg', limit: 100})
-        
-        // Old powerpoints
-        if(file.endsWith(".ppt")) {
-            newName = file.slice(0, -3).replace(' ', '_') + 'pdf';
-            ConvertFile(file, newName);
-            currentFiles.push({name: file, url: newName.slice(0, -4)})            
-        }
+            var result = findRemoveSync('/tmp', {age: {seconds: 3600}, extensions: '.jpg', limit: 100})
+            
+            // Old powerpoints
+            if(file.endsWith(".ppt")) {
+                newName = file.slice(0, -3).replace(' ', '_') + 'pdf';
+                ConvertFile(file, newName);
+                currentFiles.push({name: file, url: newName.slice(0, -4)})            
+            }
 
-        // New Powerpoints
-        if(file.endsWith(".pptx")) {
-            newName = file.slice(0, -4).replace(' ', '_') + 'pdf';
-            ConvertFile(file, newName);
-            currentFiles.push({name: file, url: newName.slice(0, -4)})   
-        }
+            // New Powerpoints
+            if(file.endsWith(".pptx")) {
+                newName = file.slice(0, -4).replace(' ', '_') + 'pdf';
+                ConvertFile(file, newName);
+                currentFiles.push({name: file, url: newName.slice(0, -4)})   
+            }
 
-        // Existing PDFs
-        if(file.endsWith(".pdf"))
-        {
-            newName = file.replace(' ', "_")
-            currentFiles.push({name: file, url: newName.slice(0, -4)})   
-        }
-    });
+            // Existing PDFs
+            if(file.endsWith(".pdf"))
+            {
+                newName = file.replace(' ', "_")
+                currentFiles.push({name: file, url: newName.slice(0, -4)})   
+            }
+        });
 
-    // Log files available
-    console.log(currentFiles);
-    return currentFiles;
+        // Log files available
+        console.log(currentFiles);
+        callback(currentFiles);
+    })
 };
 
 // Update New Page data
 app.get('/new', function (req, res) {
     // Load file directory using ReadFiles function
-    res.render('new/new', {currentFiles:  ReadFiles(fs.readdirSync(path))});
+    ReadFiles(function(currentFiles) {
+        res.render('new/new', {currentFiles: currentFiles});
+    })
+
 });
+
+// Return Stream:
+function ReturnStream(req, file, callback)
+{
+    getPageCount(path + file).then(pages => {
+        newID = newStream(req.body.streamName, req.body.tutorName, file, pages);
+        callback('/' + newID.streamID + '/' + newID.admimID);
+    });
+}
 
 // Create new Stream
 app.post('/new', function(req, res){
-    console.log(req.body);
-    getPageCount(path + req.body.file).then(pages => {
-        console.log(pages);
-        newID = newStream(req.body.streamName, req.body.tutorName, req.body.file, pages);
-        res.redirect('/' + newID.streamID + '/' + newID.admimID);
-    })
+    if(req.body.file == ".newfile."){
+        req.files.fileUpload.mv(path + req.files.fileUpload.name,
+        function(err) {
+            if(err) {
+                console.error(err);
+            }
+            // Convert
+            // Old powerpoints
+            if(req.files.fileUpload.name.endsWith(".ppt")) {
+                newName = file.slice(0, -3).replace(' ', '_') + 'pdf';
+                ConvertFile(req.files.fileUpload.name, newName, 
+                    function() {
+                        ReturnStream(req, newName,
+                            function(url){
+                                res.redirect(url);
+                            });
+                    });      
+            }
+            // New Powerpoints
+            if(req.files.fileUpload.name.endsWith(".pptx")) {
+                newName = file.slice(0, -4).replace(' ', '_') + 'pdf';
+                ConvertFile(req.files.fileUpload.name, newName, 
+                    function() {
+                        ReturnStream(req, newName,
+                        function(url){
+                            res.redirect(url);
+                        });
+                    });
+            }
+            if(req.files.fileUpload.name.endsWith(".pdf")) {
+                ReturnStream(req, req.files.fileUpload.name,
+                    function(url){
+                        res.redirect(url);
+                    });
+            }
+        })
+    } else {
+        ReturnStream(req, req.body.file,
+            function(url){
+                res.redirect(url);
+        });
+    }
 });
 
 /// ---------------- Streams ----------------
@@ -131,11 +185,11 @@ function newStream(name, tutor, file, pageCount) {
         currentPage: 1, pageLimit: pageCount}
 
     app.get('/' + id, function(req, res){
-        res.render('viewer/viewer', {type: user, file: file, streamDetails: streams[id]})
+        res.render('viewer/viewer', {type: "user", file: file, streamDetails: streams[id]})
     })
 
     app.get('/' + id + '/' + admin, function(req, res){
-        res.render('viewer/viewer', {type: admin, file: file, streamDetails: streams[id]})
+        res.render('viewer/viewer', {type: "admin", file: file, streamDetails: streams[id]})
     })
     
     return {streamID: id, admimID: admin};
@@ -190,6 +244,4 @@ app.listen(8080);
 // Self Host
 http.listen(25565, function () {
     console.log('listening on *:25565');
-    // Debug:
-    newStream('Test', 10);
 });

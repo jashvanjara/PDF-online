@@ -12,7 +12,7 @@
     <h2>Create Stream</h2>
 
     <br />
-    <form method="post" action="/new">
+    <form method="post" action="/new" encType="multipart/form-data">
         <label for="streamName">Stream name:</label><br>
         <input type="text" id="streamName" name="streamName"><br>
         <label for="tutorName">Tutor name:</label><br>
@@ -22,10 +22,17 @@
         <br>
 
         <label for="file">Choose a file:</label>
-        <select id="file" name="file">
+        <select id="file" name="file" onchange="newFile(this)">
         <% currentFiles.forEach(function(file) { %>
             <option value=<%= file.name %>> <%= file.url %> </option>
         <% }); %>
+            <option value=".newfile."> - Upload a New File - </option>
+        </select>
+        <br>
+        <div id="Upload" style="display: none">
+            <label for="fileUpload">Choose a file:</label>
+            <input id="fileUpload" name="fileUpload" type="file"/>
+        </div>
         </select>
 
         <br>
@@ -38,5 +45,5 @@
     
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
     <script src="../socket.io/socket.io.js"></script>
-    <script src="index/index.js"></script>
+    <script src="new.js"></script>
 </body>
