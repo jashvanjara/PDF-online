@@ -36,7 +36,7 @@ var ccClient = new CloudmersiveConvertApiClient.ConvertDocumentApi();
 
 /// ---------------- File Parsing ----------------
 // Conversion Function:
-function ConvertFile(currentFile, newFile) {
+function ConvertFile(currentFile, newFile, callback) {
     // Open File
     var inputFile = Buffer.from(fs.readFileSync(path + currentFile).buffer);
     // Call API
@@ -129,7 +129,7 @@ app.post('/new', function(req, res){
             // Convert
             // Old powerpoints
             if(req.files.fileUpload.name.endsWith(".ppt")) {
-                newName = file.slice(0, -3).replace(' ', '_') + 'pdf';
+                newName = req.files.fileUpload.name.slice(0, -3).replace(' ', '_') + 'pdf';
                 ConvertFile(req.files.fileUpload.name, newName, 
                     function() {
                         ReturnStream(req, newName,
@@ -140,7 +140,7 @@ app.post('/new', function(req, res){
             }
             // New Powerpoints
             if(req.files.fileUpload.name.endsWith(".pptx")) {
-                newName = file.slice(0, -4).replace(' ', '_') + 'pdf';
+                newName = req.files.fileUpload.name.slice(0, -4).replace(' ', '_') + 'pdf';
                 ConvertFile(req.files.fileUpload.name, newName, 
                     function() {
                         ReturnStream(req, newName,
