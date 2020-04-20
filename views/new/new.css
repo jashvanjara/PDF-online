@@ -1,4 +1,14 @@
-/* !--HTML---! */
+input {
+    border-radius: 16px;
+    border: 1px solid grey;
+}
+button {
+    font-size: 14px;
+    padding: 8px;
+    border-radius: 16px;
+    border: none;
+    background-color: #ccc;
+}
 
 html {
     font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
@@ -12,20 +22,4 @@ body {
     align-self: center;
     align-content: center;
     text-align: center;
-}
-
-table, th, td {
-    border: 1px solid black;
-    border-collapse: collapse;
-  }
-
-th {
-    font-size: 16px;
-    font-weight: normal;
-    font-style: italic;
-    padding:    3px;
-}
-
-td {
-    padding: 2px;
 }

@@ -10,19 +10,29 @@
 
 <body>
     <h2>PDF Online</h2>
-
     <br />
-    <% Object.keys(publicStreamList).forEach(function(key) { %>
-        <a href=<%= publicStreamList[key].id %>>
-            <%= publicStreamList[key].name %>
-        </a> - <%= publicStreamList[key].viewerCount %> viewers   
-            (Progress: <%= publicStreamList[key].currentPage %>/<%= publicStreamList[key].pageLimit %>)
-        <br />
-    <% }) %>
+
+    <table align="center">
+        <tr>
+            <th>Stream Name</th>
+            <th>Viewers</th>
+            <th>Current Page</th>
+        </tr>
+        <% Object.keys(publicStreamList).forEach(function(key) { %>
+            <tr>
+                <td><a href=<%= publicStreamList[key].id %>>
+                    <%= publicStreamList[key].name %></a>
+                </td>
+                <td><%= publicStreamList[key].viewerCount %></td>
+                <td><%= publicStreamList[key].currentPage %>/<%= publicStreamList[key].pageLimit %></td>
+            </tr>
+        <% }) %>
+    </table>
 
     <% if(numberOfStreams == 0){ %>
         <p>There are no streams currently running</p>
     <% } %>
+
     <br />
     <br />
 

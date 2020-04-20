@@ -5,7 +5,7 @@
     <meta http-equiv="content-type" content="text/html; charset=windows-1252">
     <title>PDF Viewer</title>
     <link href='https://fonts.googleapis.com/css?family=Merienda' rel='stylesheet'>
-    <link rel="stylesheet" href="index/index.css">
+    <link rel="stylesheet" href="new.css">
 </head>
 
 <body>
@@ -13,24 +13,22 @@
 
     <br />
     <form method="post" action="/new" encType="multipart/form-data">
-        <label for="streamName">Stream name:</label><br>
-        <input type="text" id="streamName" name="streamName"><br>
-        <label for="tutorName">Tutor name:</label><br>
-        <input type="text" id="tutorName" name="tutorName">
-
-        <br>
-        <br>
-
-        <label for="file">Choose a file:</label>
+        <p>
+            <label for="streamName">Stream name:</label>
+            <input type="text" id="streamName" name="streamName">
+        <br/>
+            <label for="tutorName">Tutor name:</label>
+            <input type="text" id="tutorName" name="tutorName">
+        </p>
+        <label for="file">Choose an existing file:</label>
         <select id="file" name="file" onchange="newFile(this)">
         <% currentFiles.forEach(function(file) { %>
             <option value=<%= file.name %>> <%= file.url %> </option>
         <% }); %>
             <option value=".newfile."> - Upload a New File - </option>
         </select>
-        <br>
         <div id="Upload" style="display: none">
-            <label for="fileUpload">Choose a file:</label>
+            <label for="fileUpload">Select File:</label>
             <input id="fileUpload" name="fileUpload" type="file"/>
         </div>
         </select>

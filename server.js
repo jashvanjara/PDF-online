@@ -74,23 +74,23 @@ function ReadFiles(callback) {
             
             // Old powerpoints
             if(file.endsWith(".ppt")) {
-                newName = file.slice(0, -3).replace(' ', '_') + 'pdf';
+                newName = file.slice(0, -3).replace(/ /g, '_') + 'pdf';
                 ConvertFile(file, newName);
-                currentFiles.push({name: file, url: newName.slice(0, -4)})            
+                currentFiles.push({name: file.replace(/ /g, "_"), url: newName.slice(0, -4)})            
             }
 
             // New Powerpoints
             if(file.endsWith(".pptx")) {
-                newName = file.slice(0, -4).replace(' ', '_') + 'pdf';
+                newName = file.slice(0, -4).replace(/ /g, '_') + 'pdf';
                 ConvertFile(file, newName);
-                currentFiles.push({name: file, url: newName.slice(0, -4)})   
+                currentFiles.push({name: file.replace(/ /g, "_"), url: newName.slice(0, -4)})   
             }
 
             // Existing PDFs
             if(file.endsWith(".pdf"))
             {
-                newName = file.replace(' ', "_")
-                currentFiles.push({name: file, url: newName.slice(0, -4)})   
+                newName = file.replace(/ /g, "_")
+                currentFiles.push({name: file.replace(/ /g, "_"), url: newName.slice(0, -4)})   
             }
         });
 
@@ -129,7 +129,7 @@ app.post('/new', function(req, res){
             // Convert
             // Old powerpoints
             if(req.files.fileUpload.name.endsWith(".ppt")) {
-                newName = req.files.fileUpload.name.slice(0, -3).replace(' ', '_') + 'pdf';
+                newName = req.files.fileUpload.name.slice(0, -3).replace(/ /g, '_') + 'pdf';
                 ConvertFile(req.files.fileUpload.name, newName, 
                     function() {
                         ReturnStream(req, newName,
@@ -140,7 +140,7 @@ app.post('/new', function(req, res){
             }
             // New Powerpoints
             if(req.files.fileUpload.name.endsWith(".pptx")) {
-                newName = req.files.fileUpload.name.slice(0, -4).replace(' ', '_') + 'pdf';
+                newName = req.files.fileUpload.name.slice(0, -4).replace(/ /g, '_') + 'pdf';
                 ConvertFile(req.files.fileUpload.name, newName, 
                     function() {
                         ReturnStream(req, newName,
