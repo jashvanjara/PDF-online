@@ -167,7 +167,8 @@ app.post('/new', function(req, res){
 /// ---------------- Streams ----------------
 // Variables
 streams = {};
-publicStreamList= {}
+publicStreamList= {};
+viewers = {};
 numberOfStreams = 0;
 // Function
 function newStream(name, tutor, file, pageCount) {
@@ -178,18 +179,19 @@ function newStream(name, tutor, file, pageCount) {
 
     // List of streams
     streams[id] = {id: id, name: name, tutor: tutor, viewerCount: 0,
-        currentPage: 1, pageLimit: pageCount, file: file, admin: admin};
+        currentPage: 1, pageLimit: pageCount, file: file, admin: admin,
+        streamers: {}, currentColor: 0};
 
 
     publicStreamList[id] = {id: id, name: name, tutor: tutor, viewerCount: 0,
         currentPage: 1, pageLimit: pageCount}
 
     app.get('/' + id, function(req, res){
-        res.render('viewer/viewer', {type: "user", file: file, streamDetails: streams[id]})
+        res.render('viewer/viewer', {type: "user", streamDetails: streams[id]})
     })
 
     app.get('/' + id + '/' + admin, function(req, res){
-        res.render('viewer/viewer', {type: "admin", file: file, streamDetails: streams[id]})
+        res.render('viewer/viewer', {type: "admin", streamDetails: streams[id]})
     })
     
     return {streamID: id, admimID: admin};
@@ -201,8 +203,8 @@ function updateStreamName(id, name){
 }
 
 function updateStreamViewers(id, viewerCount){
-    streams[id].viewerCount = viewerCount;
-    publicStreamList[id].viewerCount = viewerCount;
+    streams[id].viewerCount += viewerCount;
+    publicStreamList[id].viewerCount += viewerCount;
 }
 
 function updateStreamPage(id, page){
@@ -210,25 +212,91 @@ function updateStreamPage(id, page){
     publicStreamList[id].currentPage = page;
 }
 
+// Colours
+var CSS_COLOR_NAMES = ["Blue", "BlueViolet", "Brown", "BurlyWood", "CadetBlue", 
+"Chartreuse", "Chocolate", "Coral", "CornflowerBlue", "Cornsilk", 
+"Crimson", "Cyan", "DarkBlue", "DarkCyan", "DarkGoldenRod", "DarkGray", 
+"DarkGrey", "DarkGreen", "DarkKhaki", "DarkMagenta", "DarkOliveGreen", 
+"Darkorange", "DarkOrchid", "DarkRed", "DarkSalmon", "DarkSeaGreen", 
+"DarkSlateBlue", "DarkSlateGray", "DarkSlateGrey", "DarkTurquoise", "DarkViolet", 
+"DeepPink", "DeepSkyBlue", "DimGray", "DimGrey", "DodgerBlue", "FireBrick", 
+"FloralWhite", "ForestGreen", "Fuchsia", "Gainsboro", "GhostWhite", "Gold", 
+"GoldenRod", "Gray", "Grey", "Green", "GreenYellow", "HoneyDew", "HotPink", 
+"IndianRed", "Indigo", "Ivory", "Khaki", "Lavender", "LavenderBlush", "LawnGreen", 
+"Magenta", "Maroon", "MediumAquaMarine", "MediumBlue", "MediumOrchid",
+"MediumPurple", "MediumSeaGreen", "MediumSlateBlue", "MediumSpringGreen",
+"MediumTurquoise", "MediumVioletRed", "MidnightBlue", "MintCream", "MistyRose", 
+"Moccasin", "NavajoWhite", "Navy", "OldLace", "Olive", "OliveDrab", "Orange", 
+"OrangeRed", "Orchid", "PaleGoldenRod", "PaleGreen", "PaleTurquoise", 
+"PaleVioletRed", "PapayaWhip", "PeachPuff", "Peru", "Pink", "Plum", "PowderBlue", 
+"Purple", "Red", "RosyBrown", "RoyalBlue", "SaddleBrown", "Salmon", "SandyBrown", 
+"SeaGreen", "SeaShell", "Sienna", "Silver", "SkyBlue", "SlateBlue", "SlateGray", 
+"SlateGrey", "Snow", "SpringGreen", "SteelBlue", "Tan", "Teal", "Thistle",
+ "Tomato", "Turquoise", "Violet", "Wheat", "White", "WhiteSmoke", "Yellow", 
+ "YellowGreen"];
+
+ function newStreamer(streamID, streamerID){
+    col = CSS_COLOR_NAMES[streams[streamID].currentColor];
+    streams[streamID].currentColor++;
+    if(streams[streamID].currentColor >= CSS_COLOR_NAMES.length) {
+        streams[streamID].currentColor = 0;
+    }
+    streams[streamID].streamers[streamerID] = {x: 0, y: 0, colour: col, id: streamerID};
+ }
 
 /// ---------------- SOCKETS ----------------
 // Create Socket IO connection
 io.on('connection', function (socket) {
     console.log('A user connected');
-    
-    // Index Page
-    /*
-    socket.on('request streamlist', function(){
-        socket.join('home');
-        socket.emit('send streamlist', {
-            streamlist: publicStreamList
-        });
+
+    socket.on('subscribe', function(data){
+        console.log(data);
+        if(data.id in streams)
+        {
+            socket.join(data.id);
+            if(data.type === "admin"){
+                newStreamer(data.id, socket.id)
+            }
+            viewers[socket.id] = data.id;
+            updateStreamViewers(data.id, 1);
+            io.in(data.id).emit('viewer_count', streams[data.id].viewerCount);
+            socket.emit('update', streams[data.id].currentPage);
+        }
+    })
+
+    socket.on('page', function(data) {
+        console.log(data);
+        if(socket.id in streams[data.id].streamers)
+        {
+            updateStreamPage(data.id, data.number);
+            io.in(data.id).emit('goto_page', data.number);
+        }
     });
-    */
+
+    socket.on('move_cursor', function(data) {
+        if(data.id in streams)
+        {
+            if(socket.id in streams[data.id].streamers)
+            {
+                streams[data.id].streamers[socket.id].x = data.x;
+                streams[data.id].streamers[socket.id].y = data.y;
+                io.in(data.id).emit('draw_cursor', streams[data.id].streamers);
+            }
+        }
+    });
 
     // Disconnect
     socket.on('disconnect', function(){
         console.log('A user disconnected')
+        if(socket.id in viewers) {
+            updateStreamViewers(viewers[socket.id], -1);
+            io.in(viewers[socket.id]).emit('viewer_count', streams[viewers[socket.id]].viewerCount);
+            if(socket.id in streams[viewers[socket.id]].streamers)
+            {
+                delete streams[viewers[socket.id]].streamers[socket.id];
+            }
+            delete viewers[socket.id];
+        }
     });
 });
 

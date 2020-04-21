@@ -34,32 +34,6 @@ html {
     padding: 10px;
 }
 
-#viewers {
-    /*background-color: lightskyblue;*/
-    color: white;
-    padding: 10px;
-}
-
-a:link {
-    color: white;
-    background-color: transparent;
-    text-decoration: underline;
-  }
-  
-  a:visited {
-    color: white;
-    background-color: transparent;
-    text-decoration: underline;
-  }
-  
-  a:hover {
-    color: white;
-    background-color: transparent;
-    text-decoration: underline;
-    font-style: italic;
-  }
-  
-
 button {
     height: 40px;
     font-family: Merienda;
@@ -87,7 +61,6 @@ button {
     margin: 0 auto;
 }
 canvas {
-    cursor: none;
     position: absolute;
     display: inline;
     padding-top: 3px;
