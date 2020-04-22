@@ -243,6 +243,7 @@ var CSS_COLOR_NAMES = ["Blue", "BlueViolet", "Brown", "BurlyWood", "CadetBlue",
         streams[streamID].currentColor = 0;
     }
     streams[streamID].streamers[streamerID] = {x: 0, y: 0, colour: col, id: streamerID};
+    return col;
  }
 
 /// ---------------- SOCKETS ----------------
@@ -256,7 +257,7 @@ io.on('connection', function (socket) {
         {
             socket.join(data.id);
             if(data.type === "admin"){
-                newStreamer(data.id, socket.id)
+                socket.emit('streamer_color', newStreamer(data.id, socket.id));
             }
             viewers[socket.id] = data.id;
             updateStreamViewers(data.id, 1);
@@ -281,7 +282,7 @@ io.on('connection', function (socket) {
             {
                 streams[data.id].streamers[socket.id].x = data.x;
                 streams[data.id].streamers[socket.id].y = data.y;
-                io.in(data.id).emit('draw_cursor', streams[data.id].streamers);
+                socket.to(data.id).emit('draw_cursor', streams[data.id].streamers);
             }
         }
     });

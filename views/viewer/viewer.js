@@ -252,10 +252,16 @@ function findScreenCoords(mouseEvent) {
     ypos /= scale;
     xpos /= scale;
     socket.emit('move_cursor', { id: id, x: xpos, y: ypos });
+    draw_cursor([{ id: id, x: xpos, y: ypos, colour: my_color }]);
 }
 
 // Draw
-socket.on('draw_cursor', function (data) {
+my_color = "Blue";
+socket.on('streamer_color', function(color) {
+    my_color = color;
+})
+
+function draw_cursor(data) {
     var ccanvas = document.getElementById("cursor");
     var ctx = ccanvas.getContext("2d");
 
@@ -282,4 +288,8 @@ socket.on('draw_cursor', function (data) {
         ctx.lineTo((data[key].x + 4) * scale, (data[key].y + 11) * scale);
         ctx.fill();
     });
+}
+
+socket.on('draw_cursor', function (data) {
+    draw_cursor(data);
 });
