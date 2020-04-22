@@ -15,7 +15,8 @@ var CloudmersiveConvertApiClient = require('cloudmersive-convert-api-client');
 
 /// ---------------- Initialise
 // Variables:
-path = './public/files/';
+var port = process.env.PORT || 3000;
+var path = './public/files/';
 
 // Express:
 app.set('view engine', 'ejs');
@@ -307,9 +308,7 @@ app.get('/', function (req, res) {
 });
 
 /// ---------------- Start Website ----------------
-// Glitch
-app.listen(8080);
-// Self Host
-http.listen(25565, function () {
-    console.log('listening on *:25565');
+// Start server
+http.listen(port, function () {
+    console.log('listening on *:' + port);
 });

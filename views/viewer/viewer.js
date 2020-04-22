@@ -267,19 +267,19 @@ socket.on('draw_cursor', function (data) {
         //ctx.fillRect(data[key].x * scale, data[key].y * scale, 10, 10);
 
         // Circle 
+        /*
         size = 5;
         ctx.beginPath();
         ctx.arc(data[key].x * scale + size, data[key].y * scale + size, size, 0, 2 * Math.PI, false);
         ctx.fill();
+        */
         
 
         // Point
-        /*
         ctx.beginPath();
         ctx.moveTo(data[key].x * scale, data[key].y * scale);
         ctx.lineTo((data[key].x + 11) * scale, (data[key].y + 4) * scale);
         ctx.lineTo((data[key].x + 4) * scale, (data[key].y + 11) * scale);
         ctx.fill();
-        */
     });
 });
