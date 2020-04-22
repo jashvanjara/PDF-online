@@ -177,12 +177,15 @@ function newStream(name, tutor, file, pageCount) {
     id = uniqid();
     admin = uniqid();
     numberOfStreams += 1;
+    
+    if(name.replace(/ /g, '_') === "") {
+        name = file;
+    }
 
     // List of streams
     streams[id] = {id: id, name: name, tutor: tutor, viewerCount: 0,
         currentPage: 1, pageLimit: pageCount, file: file, admin: admin,
         streamers: {}, currentColor: 0};
-
 
     publicStreamList[id] = {id: id, name: name, tutor: tutor, viewerCount: 0,
         currentPage: 1, pageLimit: pageCount}
@@ -195,6 +198,8 @@ function newStream(name, tutor, file, pageCount) {
         res.render('viewer/viewer', {type: "admin", streamDetails: streams[id]})
     })
     
+    console.log("New Stream: " + '/' + id + '/' + admin);
+
     return {streamID: id, admimID: admin};
 }
 
@@ -267,7 +272,7 @@ io.on('connection', function (socket) {
     })
 
     socket.on('page', function(data) {
-        console.log(data);
+        //console.log(data);
         if(socket.id in streams[data.id].streamers)
         {
             updateStreamPage(data.id, data.number);
