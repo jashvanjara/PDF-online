@@ -5,4 +5,8 @@ function newFile(selected) {
         document.getElementById("Upload").style.display = "none";
     }
 }
-document.getElementById("Upload").style.display = "none";
+if (currentFiles == "") {
+    document.getElementById("Upload").style.display = "block";
+} else {
+    document.getElementById("Upload").style.display = "none";
+} 
